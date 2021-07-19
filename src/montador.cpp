@@ -13,8 +13,13 @@ Lexer::Lexer(std::string file_name) {
     }
 
     this->number_lines = this->buffer.size();
-    for (auto item: this->buffer)
-        std::cout << item << std::endl;
+}
 
-    std::cout << this->number_lines << std::endl;
+TOKEN Lexer::next() {
+    if (this->buffer.empty())
+        return "\0";
+
+    TOKEN token = this->buffer[0];
+    this->buffer.erase(this->buffer.begin());
+    return token;
 }
