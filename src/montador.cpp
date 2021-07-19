@@ -61,8 +61,11 @@ void Parser::parse() {
     for (std::string line; line != "EOF$$$"; line = this->lexer.next(), i++) {
         auto tokens = this->lexer.tokenize_line(line);
         for (const auto& token : tokens) {
-            if (is_label(token))
-                this->upsert(token, std::to_string(i));
+            if (is_label(token)) {
+                auto label = token;
+                label.pop_back();
+                this->upsert(label, std::to_string(i));
+            }
 
             else if (is_operator(token))
                 this->upsert(token, _CODES.at(token));
