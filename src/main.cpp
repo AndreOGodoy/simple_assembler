@@ -3,11 +3,12 @@
 #include "montador.h"
 
 int main(int argc, char *argv[]) {
-    // TODO: executar o montador...
+    Assembler::Lexer lexer(argv[1]);
+    Assembler::Parser parser(lexer);
 
-    Lexer lexer(argv[1]);
-    Parser parser(lexer);
-    parser.parse();
-    std::cout << parser.generate() << std::endl;
+    parser.parse(); // Primeira passagem
+    auto output = parser.generate(); // Segunda passagem
+
+    std::cout << output << std::endl;
     return 0;
 }

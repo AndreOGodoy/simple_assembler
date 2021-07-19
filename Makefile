@@ -2,12 +2,9 @@
 ########################### Parametros de Projeto #############################
 ###############################################################################
 
-# TODO: altere a extensão dos arquivos (c ou cpp)
 EXT = cpp
-# TODO: altere a lista de forma que contenha todos os arquivos .cpp
-#       do seu projeto (sem a extensão), que deve estar no diretório 
-#       src/
-SRCS_MONTADOR = $(patsubst %,%.$(EXT),main montador)
+
+SRCS_MONTADOR = $(patsubst %,%.$(EXT),main montador codes)
 OBJS_MONTADOR = $(patsubst %,build/%.o,$(basename $(SRCS_MONTADOR)))
 
 ###############################################################################
