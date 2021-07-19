@@ -51,8 +51,49 @@ std::vector<TOKEN> Lexer::tokenize_line(LINE_TOKEN line_token) {
 Parser::Parser(Lexer &lexer) : lexer(lexer) {}
 
 void Parser::parse() {
-    std::string line = this->lexer.next();
+    size_t i = 0;
+    for (std::string line; line != "EOF$$$"; line = this->lexer.next(), i++) {
+        auto tokens = this->lexer.tokenize_line(line);
+        for (const auto& token : tokens) {
+            if (is_label(token))
+                this->upsert(token, std::to_string(i));
 
-    auto tokens = this->lexer.tokenize_line(line);
+            else if (is_operator(token))
+                this->upsert(token, _CODES.at(token));
+
+            else if (is_register(token))
+                this->upsert(token, _REGISTERS.at(token));
+
+            else if (is_literal(token))
+                this->upsert(token, token);
+        }
+    }
 
 }
+
+bool Parser::is_register(const TOKEN& token) {
+    return _REGISTERS.find(token) != _REGISTERS.end();
+}
+
+bool Parser::is_label(const TOKEN& token) {
+    if (token.empty())
+        return false;
+    return token[token.size()-1] == ':';
+}
+
+bool Parser::is_literal(const TOKEN& token) {
+    return std::all_of(token.begin(), token.end(), ::isdigit);
+}
+
+void Parser::upsert(TOKEN token, std::string value) {
+    if (this->symbol_table.find(token) == this->symbol_table.end()) {
+        symbol_table.insert(std::pair<std::string, std::string>(token, value));
+    }
+    else
+        symbol_table[token] = value;
+}
+
+bool Parser::is_operator(const TOKEN &token) {
+    return _CODES.find(token) != _CODES.end();
+}
+

@@ -67,6 +67,13 @@ private:
 public:
     Parser(Lexer &lexer);
     void parse();
+
+    static bool is_literal(const TOKEN& token);
+    static bool is_label(const TOKEN& token);
+    static bool is_register(const TOKEN& token);
+    static bool is_operator(const TOKEN& token);
+
+    void upsert(TOKEN token, std::string value);
 };
 
 #endif
