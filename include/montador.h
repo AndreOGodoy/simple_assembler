@@ -39,8 +39,8 @@ const static std::map<std::string, std::string> _CODES = {
         { "JN", "18"},
         { "CALL", "19"},
         { "RET", "20"},
-        {"END", ""},
-        {"WORD", ""},
+        {"END", "END"},
+        {"WORD", "WORD"},
 };
 
 
