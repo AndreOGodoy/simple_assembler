@@ -4,6 +4,8 @@
 
 int main(int argc, char *argv[]) {
     // TODO: executar o montador...
-    std::cout << "Hello World" << std::endl;
+
+    Lexer lexer(argv[1]);
+
     return 0;
 }
