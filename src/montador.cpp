@@ -22,7 +22,7 @@ Lexer::Lexer(const Lexer &lexer) {
 
 LINE_TOKEN Lexer::next() {
     if (this->buffer.empty())
-        return "\0";
+        return "EOF$$$";
 
     LINE_TOKEN token = this->buffer[0];
     this->buffer.erase(this->buffer.begin());
@@ -96,4 +96,3 @@ void Parser::upsert(TOKEN token, std::string value) {
 bool Parser::is_operator(const TOKEN &token) {
     return _CODES.find(token) != _CODES.end();
 }
-
