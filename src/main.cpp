@@ -7,9 +7,7 @@ int main(int argc, char *argv[]) {
 
     Lexer lexer(argv[1]);
     Parser parser(lexer);
-    for (int i = 0; i < 5; i++) {
-        parser.parse();
-    }
-
+    parser.parse();
+    std::cout << parser.generate() << std::endl;
     return 0;
 }

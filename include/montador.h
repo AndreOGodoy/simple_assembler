@@ -70,6 +70,7 @@ private:
 public:
     Parser(Lexer &lexer);
     void parse();
+    std::string generate();
 
     static bool is_literal(const TOKEN& token);
     static bool is_label(const TOKEN& token);

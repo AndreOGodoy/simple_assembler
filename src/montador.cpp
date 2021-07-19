@@ -74,7 +74,50 @@ void Parser::parse() {
                 this->upsert(token, token);
         }
     }
+}
 
+std::string Parser::generate() {
+    this->lexer.reset_state();
+
+    std::string header, output;
+    size_t n_symbols = 0;
+    bool end_program_flag = false;
+
+    for (std::string line; line != "EOF$$$" && !end_program_flag; line = this->lexer.next()) {
+        auto tokens = this->lexer.tokenize_line(line);
+        for (const auto& token : tokens) {
+            std::string code;
+
+            if (is_label(token))
+                continue;
+
+            code = this->symbol_table[token];
+
+            if (code == "WORD") {
+                continue;
+            }
+
+            if (code == "END") {
+                output.append(" ");
+                end_program_flag = true;
+                break;
+            }
+
+            output.append(code + " ");
+            n_symbols++;
+        }
+    }
+
+    header.append("MV-EXE\n");
+    header.append("\n");
+    header.append(std::to_string(n_symbols) + " ");
+    header.append(std::to_string(100) + " ");
+    header.append(std::to_string(999) + " ");
+    header.append(std::to_string(100) + " ");
+    header.append("\n");
+    header.append("\n");
+
+    return header + output;
 }
 
 bool Parser::is_register(const TOKEN& token) {
