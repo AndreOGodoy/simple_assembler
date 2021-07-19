@@ -52,10 +52,13 @@ class Lexer {
 private:
     std::vector<std::string> buffer;
     size_t number_lines;
+    size_t current_line;
 public:
     Lexer(std::string file_name);
     Lexer(const Lexer&);
     LINE_TOKEN next();
+
+    void reset_state();
 
     std::vector<TOKEN> tokenize_line(LINE_TOKEN line_token);
 };

@@ -12,20 +12,22 @@ Lexer::Lexer(std::string file_name) {
         this->buffer.push_back(line);
     }
 
+    this->current_line = 0;
     this->number_lines = this->buffer.size();
 }
 
 Lexer::Lexer(const Lexer &lexer) {
     this->number_lines = lexer.number_lines;
+    this->current_line = lexer.current_line;
     this->buffer = lexer.buffer;
 }
 
 LINE_TOKEN Lexer::next() {
-    if (this->buffer.empty())
+    if (this->current_line == this->number_lines)
         return "EOF$$$";
 
-    LINE_TOKEN token = this->buffer[0];
-    this->buffer.erase(this->buffer.begin());
+    LINE_TOKEN token = this->buffer[current_line];
+    this->current_line++;
     return token;
 }
 
@@ -46,6 +48,10 @@ std::vector<TOKEN> Lexer::tokenize_line(LINE_TOKEN line_token) {
                  [](const TOKEN& x) {return !x.empty();});
 
     return filtered_tokens;
+}
+
+void Lexer::reset_state() {
+    this->current_line = 0;
 }
 
 Parser::Parser(Lexer &lexer) : lexer(lexer) {}
