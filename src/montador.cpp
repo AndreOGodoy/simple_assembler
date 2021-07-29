@@ -6,9 +6,10 @@ namespace Assembler {
     Lexer::Lexer(const std::string &file_name) {
         std::ifstream fs(file_name);
         std::string line;
-
         while (std::getline(fs, line, '\n')) {
-            if (line.empty() || line[0] == ';' || line[0] == ' ')
+            auto first_non_space = line.find_first_not_of(" \t");
+
+            if (line.empty() || first_non_space == std::string::npos || line.at(first_non_space) == ';')
                 continue;
 
             this->buffer.push_back(line);
@@ -40,9 +41,11 @@ namespace Assembler {
         std::vector<TOKEN> tokens;
 
         while (std::getline(ss, item, ' ')) {
-            if (item.at(0) == ';')
+            if (not item.empty() and item.at(0) == ';')
                 break;
-
+            else if (item.empty()) {
+                continue;
+            }
             tokens.push_back(item);
         }
         std::vector<TOKEN> filtered_tokens;
@@ -50,10 +53,7 @@ namespace Assembler {
                      std::back_inserter(filtered_tokens),
                      [](const TOKEN &x) { return !x.empty(); });
 
-        for (const auto &token : filtered_tokens)
-            std::cout << "Token: " << token << " ";
 
-        std::cout << std::endl << "---------------------" << std::endl;
         return filtered_tokens;
     }
 
