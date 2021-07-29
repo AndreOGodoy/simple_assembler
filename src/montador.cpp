@@ -63,21 +63,30 @@ namespace Assembler {
 
     void Parser::parse() {
         size_t i = 0;
+        size_t n_symbols = 0;
         for (std::string line; line != "EOF$$$"; line = this->lexer.next(), i++) {
             auto tokens = this->lexer.tokenize_line(line);
             for (const auto &token : tokens) {
                 if (is_label(token)) {
                     auto label = token;
                     label.pop_back();
-                    this->upsert(label, std::to_string(i));
-                } else if (is_operator(token))
+                    this->upsert(label, std::to_string(n_symbols));
+                    continue;
+                }
+                else if (is_operator(token)) {
                     this->upsert(token, CODES::OPS.at(token));
+                }
 
-                else if (is_register(token))
+                else if (is_register(token)) {
                     this->upsert(token, CODES::REGISTERS.at(token));
+                }
 
-                else if (is_literal(token))
+                else if (is_literal(token)) {
                     this->upsert(token, token);
+                }
+
+                if (token != "WORD" and token != "END")
+                    n_symbols++;
             }
         }
     }
@@ -89,8 +98,9 @@ namespace Assembler {
         size_t n_symbols = 0;
         bool end_program_flag = false;
 
+        size_t i = 0;
         for (std::string line; line != "EOF$$$" && !end_program_flag;
-             line = this->lexer.next()) {
+             line = this->lexer.next(), i++) {
 
             auto tokens = this->lexer.tokenize_line(line);
 
@@ -100,7 +110,12 @@ namespace Assembler {
                 if (is_label(token))
                     continue;
 
-                code = this->symbol_table[token];
+                if (not is_register(token) and not is_literal(token) and not is_operator(token)) {
+                    int abs_pos = std::stoi(this->symbol_table[token]);
+                    code = std::to_string(abs_pos - int(n_symbols) - 1);
+                } else {
+                    code = this->symbol_table[token];
+                }
 
                 if (code == "WORD") {
                     continue;
