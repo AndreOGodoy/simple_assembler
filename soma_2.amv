@@ -1,0 +1,14 @@
+CALL inicializa_r1_r2
+ADD R1 R2
+WRITE R1
+HALT
+
+const50: WORD 50
+const200: WORD 200
+
+inicializa_r1_r2:
+LOAD R1 const200
+LOAD R2 const50
+RET
+
+END

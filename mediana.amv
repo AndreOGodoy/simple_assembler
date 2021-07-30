@@ -1,0 +1,138 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Cálculo da Mediana
+; Entrada: 5 inteiros (via input)
+; Saída: Mediana (registrador X)
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; R0 e R1 armazenam os valoes atuais a serem comparados
+; Valores que compoem as medianas: m1 m2 m3 m4 m5 (labels da memória)
+; Ordem dos valores lidos: n1 n2 n3 n4 n5 (apenas id. nos comentários)
+
+READ R0                                           ; n1
+READ R1                                           ; n2
+
+COPY R2 R1
+SUB R2 R0                                         ; Caso a ultima operação seja negativa,
+JN n1_greater_n2                                  ; n1 > n2
+
+STORE R0 m1                                       ; Caso contrário,  n2 >= n1
+STORE R1 m2                                       ;
+
+JUMP READ_n3
+
+n1_greater_n2:
+STORE R1 m1                                       ; Guarda o menor no primeiro lugar da fila
+STORE R0 m2                                       ; Guarda o maior no segundo lugar da fila
+
+READ_n3:
+READ R0                                           ; R0 recebe novo valor n3
+LOAD R1 m2                                        ; Aqui, R1 = maior elemento visto até então
+COPY R2 R0                                        ;
+SUB R2 R1                                         ; R2 = n3 - <maior_da_fila>
+JN n2_greater_n3
+STORE R0 m3
+
+JUMP READ_n4
+
+n2_greater_n3:
+STORE R1 m3                                       ; n2 avança uma posição na fila, pois é o maior dos 3 até então
+LOAD R1 m1
+COPY R2 R0
+SUB R2 R1                                         ; Verifica e armazena corretamente o maior elemento
+JN n1_greater_n3                                  ; entre os dois restantes
+STORE R0 m2                                       ;
+
+JUMP READ_n4
+
+n1_greater_n3:
+STORE R1 m2                                       ; A lógica continua igual, apenas com mais comparações
+STORE R0 m1
+
+READ_n4:
+READ R0
+LOAD R1 m3
+COPY R2 R0
+SUB R2 R1
+JN n3_greater_n4
+STORE R0 m4
+JUMP READ_n5
+
+n3_greater_n4:
+STORE R1 m4
+LOAD R1 m2
+COPY R2 R0
+SUB R2 R1
+JN n2_greater_n4
+STORE R0 m3
+JUMP READ_n5
+
+n2_greater_n4:
+STORE R1 m3
+LOAD R1 m1
+COPY R2 R0
+SUB R2 R1
+JN n1_greater_n4
+STORE R0 m2
+JUMP READ_n5
+
+n1_greater_n4:
+STORE R1 m2
+STORE R0 m1
+
+READ_n5:
+READ R0
+LOAD R1 m4
+COPY R2 R0
+SUB R2 R1
+JN n4_greater_n5
+STORE R0 m5
+JUMP END_PROGRAM
+
+n4_greater_n5:
+STORE R1 m5
+LOAD R1 m3
+COPY R2 R0
+SUB R2 R1
+JN n3_greater_n5
+STORE R0 m4
+JUMP END_PROGRAM
+
+n3_greater_n5:
+STORE R1 m4
+LOAD R1 m2
+COPY R2 R0
+SUB R2 R1
+JN n2_greater_n5
+STORE R0 m3
+JUMP END_PROGRAM
+
+n2_greater_n5:
+STORE R1 m3
+LOAD R1 m1
+COPY R2 R0
+SUB R2 R1
+JN n1_greater_n5
+STORE R0 m2
+JUMP END_PROGRAM
+
+n1_greater_n5:
+STORE R1 m2
+STORE R0 m1
+
+END_PROGRAM:
+LOAD R0 m3
+WRITE R0
+HALT
+
+m1: WORD 0
+m2: WORD 0
+m3: WORD 0
+m4: WORD 0
+m5: WORD 0
+END
