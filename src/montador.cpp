@@ -9,6 +9,7 @@ namespace Assembler {
         while (std::getline(fs, line, '\n')) {
             auto first_non_space = line.find_first_not_of(" \t");
 
+            // Linhas vazias ou que possuem apenas comentários são ignoradas
             if (line.empty() || first_non_space == std::string::npos || line.at(first_non_space) == ';')
                 continue;
 
@@ -29,6 +30,8 @@ namespace Assembler {
         if (this->current_line == this->number_lines)
             return "EOF$$$";
 
+        // Ao prover uma LINE_TOKEN, atualiza o valor de current_line para
+        // gerar a LINE_TOKEN seguinte quando este método for chamado novamente
         LINE_TOKEN token = this->buffer[current_line];
         this->current_line++;
         return token;
@@ -41,6 +44,7 @@ namespace Assembler {
         std::vector<TOKEN> tokens;
 
         while (std::getline(ss, item, ' ')) {
+            // LINE_TOKEN que começa com ';' não precisam ser tokenizadas
             if (not item.empty() and item.at(0) == ';')
                 break;
             else if (item.empty()) {
@@ -48,6 +52,7 @@ namespace Assembler {
             }
             tokens.push_back(item);
         }
+        // Remoção de pseudo-tokens que contém apenas espaços
         std::vector<TOKEN> filtered_tokens;
         std::copy_if(tokens.begin(), tokens.end(),
                      std::back_inserter(filtered_tokens),
@@ -62,14 +67,14 @@ namespace Assembler {
     Parser::Parser(Lexer &lexer) : lexer(lexer) {}
 
     void Parser::parse() {
-        size_t i = 0;
-        size_t n_symbols = 0;
+        size_t i = 0; // Linhas passadas
+        size_t n_symbols = 0; // Símbolos passados
         for (std::string line; line != "EOF$$$"; line = this->lexer.next(), i++) {
             auto tokens = this->lexer.tokenize_line(line);
             for (const auto &token : tokens) {
                 if (is_label(token)) {
                     auto label = token;
-                    label.pop_back();
+                    label.pop_back(); // Remove ':' da label
                     this->upsert(label, std::to_string(n_symbols));
                     continue;
                 }
@@ -85,6 +90,7 @@ namespace Assembler {
                     this->upsert(token, token);
                 }
 
+                // WORD e END não contam para o número de símbolos, pois são pseudo-instruções.
                 if (token != "WORD" and token != "END")
                     n_symbols++;
             }
@@ -95,10 +101,10 @@ namespace Assembler {
         this->lexer.reset_state();
 
         std::string header, output;
-        size_t n_symbols = 0;
-        bool end_program_flag = false;
+        size_t n_symbols = 0; // Símbolos passados
+        bool end_program_flag = false; // Caso verdadeiro, não executa próxima iteração do laço
 
-        size_t i = 0;
+        size_t i = 0; // Linhas passadas
         for (std::string line; line != "EOF$$$" && !end_program_flag;
              line = this->lexer.next(), i++) {
 
@@ -111,6 +117,7 @@ namespace Assembler {
                     continue;
 
                 if (not is_register(token) and not is_literal(token) and not is_operator(token)) {
+                    // Token é uma label sendo utilizada como operando. Calcula-se seu valor relativo
                     int abs_pos = std::stoi(this->symbol_table[token]);
                     code = std::to_string(abs_pos - int(n_symbols) - 1);
                 } else {
@@ -144,16 +151,25 @@ namespace Assembler {
         return header + output;
     }
 
+    // Um TOKEN é um operador caso seja encontrado na tabela de operações
+    bool Parser::is_operator(const TOKEN &token) {
+        return CODES::OPS.find(token) != CODES::OPS.end();
+    }
+
+    // Um TOKEN é um registrador caso seja encontrado na tabela de registradores
     bool Parser::is_register(const TOKEN &token) {
         return CODES::REGISTERS.find(token) != CODES::REGISTERS.end();
     }
 
+    // Um TOKEN é uma label caso possua ':' ao fim
     bool Parser::is_label(const TOKEN &token) {
         if (token.empty())
             return false;
         return token[token.size() - 1] == ':';
     }
 
+
+    // Um TOKEN é um literal caso contenha apenas digitos
     bool Parser::is_literal(const TOKEN &token) {
         return std::all_of(token.begin(), token.end(), ::isdigit);
     }
@@ -163,9 +179,5 @@ namespace Assembler {
             symbol_table.insert(std::pair<std::string, std::string>(token, value));
         } else
             symbol_table[token] = value;
-    }
-
-    bool Parser::is_operator(const TOKEN &token) {
-        return CODES::OPS.find(token) != CODES::OPS.end();
     }
 } // namespace Assembler
